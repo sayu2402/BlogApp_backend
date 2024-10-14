@@ -36,38 +36,42 @@ from api import models as api_models
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = api_serializer.MyTokenObtainPairSerializer
 
+
 class RegisterView(generics.CreateAPIView):
     queryset = api_models.User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = api_serializer.RegisterSerializer
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
+
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [AllowAny]
     serializer_class = api_serializer.ProfileSerializer
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
 
     def get_object(self):
-        user_id = self.kwargs['user_id']
+        user_id = self.kwargs["user_id"]
         user = api_models.User.objects.get(id=user_id)
         profile = api_models.Profile.objects.get(user=user)
         return profile
 
+
 class CategoryListAPIView(generics.ListAPIView):
     serializer_class = api_serializer.CategorySerializer
     permission_classes = [AllowAny]
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
         return api_models.Category.objects.all()
 
+
 class PostCategoryListAPIView(generics.ListAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
-        category_slug = self.kwargs['category_slug']
+        category_slug = self.kwargs["category_slug"]
         category = api_models.Category.objects.get(slug=category_slug)
         posts = api_models.Post.objects.get(category=category, status="Active")
         return posts
@@ -76,7 +80,7 @@ class PostCategoryListAPIView(generics.ListAPIView):
 class PostListAPIView(generics.ListAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
         return api_models.Post.objects.filter(status="Activate")
@@ -85,35 +89,33 @@ class PostListAPIView(generics.ListAPIView):
 class PostDetailAPIView(generics.RetrieveAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
-    authentication_classes= [SessionAuthentication]
+    authentication_classes = [SessionAuthentication]
 
     def get_object(self):
-        slug = self.kwargs['slug']
-        post = api_models.Post.objects.get(slug=slug, status='Activate')
+        slug = self.kwargs["slug"]
+        post = api_models.Post.objects.get(slug=slug, status="Activate")
         post.views += 1
         post.save()
         return post
 
+
 class LikePostAPIView(APIView):
-    authentication_classes= [SessionAuthentication]
-    
+    authentication_classes = [SessionAuthentication]
+
     def post(self, request):
-        user_id = request.data['user_id']
-        post_id = request.data['post_id']
+        user_id = request.data["user_id"]
+        post_id = request.data["post_id"]
 
         user = api_models.User.objects.get(id=user_id)
         post = api_models.Post.objects.get(id=post_id)
 
         if user in post.likes.all():
             post.likes.remove(user)
-            return Response({"message" : "Post Disliked"}, status=status.HTTP_200_OK)
+            return Response({"message": "Post Disliked"}, status=status.HTTP_200_OK)
         else:
             post.likes.add(user)
 
             api_models.Notification.objects.create(
-                user = post.user,
-                post = post,
-                type = "Like"
+                user=post.user, post=post, type="Like"
             )
             return Response({"message": "Post Liked"}, status=status.HTTP_201_CREATED)
-        

@@ -11,28 +11,30 @@ import shortuuid
 class User(AbstractUser):
     username = models.CharField(unique=True, max_length=100)
     email = models.EmailField(unique=True)
-    full_name = models.CharField(max_length=100, null=True, blank= True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
     otp = models.CharField(max_length=100, null=True, blank=True)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
         return self.username
 
     def save(self, *args, **kwargs):
-        email_username, mobile = self.email.split('@')
+        email_username, mobile = self.email.split("@")
         if self.full_name == "" or self.full_name == None:
             self.full_name = email_username
         if self.username == "" or self.username == None:
             self.username = email_username
-        
+
         super(User, self).save(*args, **kwargs)
 
 
 class Profile(models.Model):
-    user =  models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.FileField(upload_to="image", default="default-user.jpg", null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.FileField(
+        upload_to="image", default="default-user.jpg", null=True, blank=True
+    )
     full_name = models.CharField(max_length=100, null=True, blank=True)
     bio = models.CharField(max_length=100, null=True, blank=True)
     about = models.CharField(max_length=100, null=True, blank=True)
@@ -44,17 +46,18 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-    
+
     def save(self, *args, **kwargs):
         if self.full_name == "" or self.full_name == None:
             self.full_name = self.user.full_name
-        
+
         super(Profile, self).save(*args, **kwargs)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
@@ -71,7 +74,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.title
-    
+
     # class Meta:
     #     ordering = ["date"]
     #     verbose_name_plural = "Category"
@@ -80,9 +83,10 @@ class Category(models.Model):
         if self.slug == "" or self.slug == None:
             self.slug == slugify(self.title)
         super(Category, self).save(*args, **kwargs)
-    
+
     def post_count(self):
         return Post.objects.filter(category=self).save()
+
 
 class Post(models.Model):
 
@@ -92,10 +96,13 @@ class Post(models.Model):
         ("Disabled", "Disabled"),
     }
 
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
-    Category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, null=True, blank=True
+    )
+    Category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, null=True, blank=True
+    )
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255, null=True, blank=True)
     image = models.FileField(upload_to="images", null=True, blank=True)
@@ -107,7 +114,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-    
+
     class Meta:
         ordering = ["date"]
         verbose_name_plural = "Post"
@@ -128,7 +135,7 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.post.title
-    
+
     class Meta:
         ordering = ["-date"]
         verbose_name_plural = "Comment"
@@ -138,10 +145,10 @@ class Bookmark(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return self.post.title
-    
+
     class Meta:
         ordering = ["-date"]
         verbose_name_plural = "Bookmark"
@@ -165,7 +172,7 @@ class Notification(models.Model):
             return f"{self.post.title} - {self.type}"
         else:
             return "Notification"
-    
+
     class Meta:
         ordering = ["-date"]
         verbose_name_plural = "Notification"
