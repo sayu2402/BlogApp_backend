@@ -48,12 +48,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.User
-        field = "__all__"
+        fields = "__all__"
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Profile
-        field = "__all__"
+        fields = "__all__"
 
 class CategorySerializer(serializers.ModelSerializer):
     def get_post_count(self, category):
@@ -61,12 +61,12 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = api_models.Category
-        Fields = ["id", "title", "image", "slug", "post_count"]
+        fields = ["id", "title", "image", "slug", "post_count"]
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Comments
-        Fields = "__all__"
+        fields = "__all__"
     
     def __init__(self, *args, **kwargs):
         super(CommentSerializer, self).__init__(*args, **kwargs)
@@ -79,7 +79,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Post
-        Fields = "__all__"
+        fields = "__all__"
     
     def __init__(self, *args, **kwargs):
         super(PostSerializer, self).__init__(*args, **kwargs)
@@ -93,7 +93,7 @@ class PostSerializer(serializers.ModelSerializer):
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Bookmark
-        Fields = "__all__"
+        fields = "__all__"
     
     def __init__(self, *args, **kwargs):
         super(BookmarkSerializer, self).__init__(*args, **kwargs)
@@ -107,7 +107,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Notification
-        Fields = "__all__"
+        fields = "__all__"
     
     def __init__(self, *args, **kwargs):
         super(NotificationSerializer, self).__init__(*args, **kwargs)
