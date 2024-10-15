@@ -94,7 +94,7 @@ class PostDetailAPIView(generics.RetrieveAPIView):
     def get_object(self):
         slug = self.kwargs["slug"]
         post = api_models.Post.objects.get(slug=slug, status="Activate")
-        post.views += 1
+        post.view += 1
         post.save()
         return post
 
@@ -166,6 +166,17 @@ class PostCommentAPIView(APIView):
 
 class BookmarkPostAPIView(APIView):
 
+    authentication_classes = [SessionAuthentication]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "user_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "post_id": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+    )
     def post(self, request):
         user_id = request.data["user_id"]
         post_id = request.data["post_id"]
@@ -183,3 +194,36 @@ class BookmarkPostAPIView(APIView):
             return Response(
                 {"message": "Bookmark Added"}, status=status.HTTP_201_CREATED
             )
+
+
+class DashboardStats(generics.ListAPIView):
+    serializer_class = api_serializer.AuthorSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = [SessionAuthentication]
+
+    def get_queryset(self):
+        user_id = self.kwargs["user_id"]
+        user = api_models.User.objects.get(id=user_id)
+
+        views = api_models.Post.objects.filter(user=user).aggregate(view=Sum("view"))[
+            "view"
+        ]
+        posts = api_models.Post.objects.filter(user=user).count()
+        likes = api_models.Post.objects.filter(user=user).aggregate(
+            total_likes=Sum("likes")
+        )["total_likes"]
+        bookmarks = api_models.Bookmark.objects.filter(post__user=user).count()
+
+        return [
+            {
+                "views": views,
+                "posts": posts,
+                "likes": likes,
+                "bookmarks": bookmarks,
+            }
+        ]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
