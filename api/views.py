@@ -102,6 +102,15 @@ class PostDetailAPIView(generics.RetrieveAPIView):
 class LikePostAPIView(APIView):
     authentication_classes = [SessionAuthentication]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "user_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "post_id": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+    )
     def post(self, request):
         user_id = request.data["user_id"]
         post_id = request.data["post_id"]
@@ -119,3 +128,37 @@ class LikePostAPIView(APIView):
                 user=post.user, post=post, type="Like"
             )
             return Response({"message": "Post Liked"}, status=status.HTTP_201_CREATED)
+
+
+class PostCommentAPIView(APIView):
+
+    authentication_classes = [SessionAuthentication]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "post_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "name": openapi.Schema(type=openapi.TYPE_STRING),
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
+                "comment": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+    )
+    def post(self, request):
+        post_id = request.data["post_id"]
+        name = request.data["name"]
+        email = request.data["email"]
+        comment = request.data["comment"]
+
+        post = api_models.Post.objects.get(id=post_id)
+
+        api_models.Comments.objects.create(
+            post=post, name=name, email=email, comment=comment
+        )
+
+        api_models.Notification.objects.create(
+            user=post.user, post=post, type="Comment"
+        )
+
+        return Response({"message": "Comment Sent"}, status=status.HTTP_201_CREATED)
