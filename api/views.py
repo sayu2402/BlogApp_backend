@@ -162,3 +162,24 @@ class PostCommentAPIView(APIView):
         )
 
         return Response({"message": "Comment Sent"}, status=status.HTTP_201_CREATED)
+
+
+class BookmarkPostAPIView(APIView):
+
+    def post(self, request):
+        user_id = request.data["user_id"]
+        post_id = request.data["post_id"]
+
+        user = api_models.User.objects.get(id=user_id)
+        post = api_models.Post.objects.get(id=post_id)
+
+        bookmark = api_models.Bookmark.objects.filter(post=post, user=user).first()
+
+        if bookmark:
+            bookmark.delete()
+            return Response({"message": "Bookmark Removed"}, status=status.HTTP_200_OK)
+        else:
+            api_models.Bookmark.objects.create(user=user, post=post, type="Bookmark")
+            return Response(
+                {"message": "Bookmark Added"}, status=status.HTTP_201_CREATED
+            )
