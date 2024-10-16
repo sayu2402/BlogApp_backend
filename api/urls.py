@@ -36,4 +36,7 @@ urlpatterns = [
         "author/dashboard/noti-mark-seen/",
         api_views.DashboardMarkNotificationAsSeen.as_view(),
     ),
+    path(
+        "author/dashboard/post-create/,", api_views.DashboardPostCreateAPIView.as_view()
+    ),
 ]
