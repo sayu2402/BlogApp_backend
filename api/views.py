@@ -327,3 +327,39 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
         return Response(
             {"message": "Post created succesfully"}, status=status.HTTP_201_CREATED
         )
+
+
+class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
+
+    authentication_classes = [SessionAuthentication]
+
+    def get_object(self):
+        user_id = self.kwargs["user_id"]
+        post_id = self.kwargs["post_id"]
+        user = api_models.User.objects.get(id=user_id)
+        return api_models.Post.objects.get(id=post_id, user=user)
+
+    def update(self, request, *args, **kwargs):
+        post_instance = self.get_object()
+
+        title = request.data.get("title")
+        image = request.data.get("image")
+        description = request.data.get("description")
+        tags = request.data.get("tags")
+        category_id = request.data.get("category")
+        post_status = request.data.get("post_status")
+
+        category = api_models.Category.objects.get(id=category_id)
+
+        post_instance.title = title
+        if image != "undefined":
+            post_instance.image = image
+        post_instance.description = description
+        post_instance.tags = tags
+        post_instance.Category = category
+        post_instance.status = post_status
+        post_instance.save()
+
+        return Response(
+            {"message": "post updated succesfully"}, status=status.HTTP_200_OK
+        )

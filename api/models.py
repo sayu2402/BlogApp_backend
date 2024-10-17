@@ -104,6 +104,7 @@ class Post(models.Model):
         Category, on_delete=models.CASCADE, null=True, blank=True
     )
     title = models.CharField(max_length=100)
+    tags = models.CharField(max_length=100)
     description = models.CharField(max_length=255, null=True, blank=True)
     image = models.FileField(upload_to="images", null=True, blank=True)
     view = models.IntegerField(default=0)
