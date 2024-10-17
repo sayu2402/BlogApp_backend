@@ -264,6 +264,8 @@ class DashboardNotificationLists(generics.ListAPIView):
 
 class DashboardMarkNotificationAsSeen(APIView):
 
+    authentication_classes = [SessionAuthentication]
+
     def post(self, request):
         noti_id = request.data["noti_id"]
         notification = api_models.Notification.objects.get(id=noti_id)
@@ -277,6 +279,8 @@ class DashboardMarkNotificationAsSeen(APIView):
 
 
 class DashboardReplyCommentAPIView(APIView):
+
+    authentication_classes = [SessionAuthentication]
 
     def post(self, request):
         comment_id = request.data["comment_id"]
@@ -292,6 +296,7 @@ class DashboardReplyCommentAPIView(APIView):
 
 
 class DashboardPostCreateAPIView(generics.CreateAPIView):
+    authentication_classes = [SessionAuthentication]
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
 
