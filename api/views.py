@@ -332,6 +332,8 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
 class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     authentication_classes = [SessionAuthentication]
+    serializer_class = api_serializer.PostSerializer
+    permission_classes = [AllowAny]
 
     def get_object(self):
         user_id = self.kwargs["user_id"]
