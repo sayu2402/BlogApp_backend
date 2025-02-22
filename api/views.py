@@ -365,3 +365,4 @@ class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
         return Response(
             {"message": "post updated succesfully"}, status=status.HTTP_200_OK
         )
+    
