@@ -73,7 +73,7 @@ class PostCategoryListAPIView(generics.ListAPIView):
     def get_queryset(self):
         category_slug = self.kwargs["category_slug"]
         category = api_models.Category.objects.get(slug=category_slug)
-        posts = api_models.Post.objects.get(category=category, status="Active")
+        posts = api_models.Post.objects.filter(category=category, status="Active")
         return posts
 
 
@@ -83,7 +83,7 @@ class PostListAPIView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication]
 
     def get_queryset(self):
-        return api_models.Post.objects.filter(status="Activate")
+        return api_models.Post.objects.all()
 
 
 class PostDetailAPIView(generics.RetrieveAPIView):
@@ -93,7 +93,8 @@ class PostDetailAPIView(generics.RetrieveAPIView):
 
     def get_object(self):
         slug = self.kwargs["slug"]
-        post = api_models.Post.objects.get(slug=slug, status="Activate")
+        print(f"Received slug: {slug}")
+        post = api_models.Post.objects.get(slug=slug, status="Active")
         post.view += 1
         post.save()
         return post

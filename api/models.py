@@ -85,7 +85,7 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
 
     def post_count(self):
-        return Post.objects.filter(category=self).save()
+        return Post.objects.filter(category=self).count()
 
 
 class Post(models.Model):
@@ -100,7 +100,7 @@ class Post(models.Model):
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, null=True, blank=True
     )
-    Category = models.ForeignKey(
+    category = models.ForeignKey(
         Category, on_delete=models.CASCADE, null=True, blank=True
     )
     title = models.CharField(max_length=100)
